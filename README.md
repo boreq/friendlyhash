@@ -58,29 +58,29 @@ If you prefer to use emoji the following library has a list of those:
 
 ## Code example
 
-	dictionary := []string{"word1", "word2", "word3", "word4", "word5", "word6"}
+    dictionary := []string{"word1", "word2", "word3", "word4", "word5", "word6"}
     hashSize := 2
 
-	// Create
-	h, err := New(dictionary, hashSize)
-	if err != nil {
-		panic(err)
-	}
+    // Create
+    h, err := New(dictionary, hashSize)
+    if err != nil {
+        panic(err)
+    }
 
-	// Humanize
-	humanized, err := h.Humanize([]byte{'a', 'b'})
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(strings.Join(humanized, "-"))
+    // Humanize
+    humanized, err := h.Humanize([]byte{'a', 'b'})
+    if err != nil {
+        panic(err)
+    }
+    fmt.Println(strings.Join(humanized, "-"))
 
-	// Dehumanize
-	dehumanized, err := h.Dehumanize(humanized)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Printf("%q\n", dehumanized)
+    // Dehumanize
+    dehumanized, err := h.Dehumanize(humanized)
+    if err != nil {
+        panic(err)
+    }
+    fmt.Printf("%q\n", dehumanized)
 
-	// Output:
-	// word2-word3-word1-word2-word2-word3-word1-word3
-	// "ab"
+    // Output:
+    // word2-word3-word1-word2-word2-word3-word1-word3
+    // "ab"
