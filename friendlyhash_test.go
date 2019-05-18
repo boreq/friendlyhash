@@ -15,9 +15,12 @@ import (
 
 	_ "golang.org/x/crypto/blake2b"
 	_ "golang.org/x/crypto/blake2s"
-	_ "golang.org/x/crypto/md4"
-	_ "golang.org/x/crypto/ripemd160"
 	_ "golang.org/x/crypto/sha3"
+
+	//lint:ignore SA1019 this is a test
+	_ "golang.org/x/crypto/md4"
+	//lint:ignore SA1019 this is a test
+	_ "golang.org/x/crypto/ripemd160"
 )
 
 func ExampleNew() {
