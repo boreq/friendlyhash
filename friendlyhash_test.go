@@ -2,10 +2,22 @@ package friendlyhash
 
 import (
 	"bytes"
+	"crypto"
 	"fmt"
 	"math"
 	"strings"
 	"testing"
+
+	_ "crypto/md5"
+	_ "crypto/sha1"
+	_ "crypto/sha256"
+	_ "crypto/sha512"
+
+	_ "golang.org/x/crypto/blake2b"
+	_ "golang.org/x/crypto/blake2s"
+	_ "golang.org/x/crypto/md4"
+	_ "golang.org/x/crypto/ripemd160"
+	_ "golang.org/x/crypto/sha3"
 )
 
 func ExampleNew() {
@@ -184,6 +196,8 @@ func TestDehumanizeInvalidWords(t *testing.T) {
 }
 
 func test(words []string, hash []byte, t *testing.T) {
+	t.Logf("testing words=%d hash=%x\n", len(words), hash)
+
 	h, err := New(words, len(hash))
 	if err != nil {
 		t.Fatalf("expected nil, got: %s", err)
@@ -222,11 +236,21 @@ func createWords(n int) []string {
 	return rv
 }
 
+func testWords(t *testing.T) <-chan []string {
+	ch := make(chan []string)
+	go func() {
+		defer close(ch)
+		for n := 1; n <= 10; n++ {
+			nWords := int(math.Pow(2, float64(n)))
+			words := createWords(nWords)
+			ch <- words
+		}
+	}()
+	return ch
+}
+
 func TestOneByte(t *testing.T) {
-	const numberOfWords = 100
-	for nWords := 2; nWords <= numberOfWords; nWords++ {
-		fmt.Printf("words=%d\n", nWords)
-		words := createWords(nWords)
+	for words := range testWords(t) {
 		for i := 0; i < 256; i++ {
 			hash := []byte{byte(i)}
 			test(words, hash, t)
@@ -235,15 +259,46 @@ func TestOneByte(t *testing.T) {
 }
 
 func TestTwoBytes(t *testing.T) {
-	for n := 1; n <= 10; n++ {
-		nWords := int(math.Pow(2, float64(n)))
-		fmt.Printf("words=%d\n", nWords)
-		words := createWords(nWords)
+	for words := range testWords(t) {
 		for i := 0; i < 256; i++ {
 			for j := 0; j < 256; j++ {
 				hash := []byte{byte(i), byte(j)}
 				test(words, hash, t)
 			}
+		}
+	}
+}
+
+func TestRealHashes(t *testing.T) {
+	hashes := []crypto.Hash{
+		crypto.MD4,         // import hgolang.org/x/crypto/md4
+		crypto.MD5,         // import crypto/md5
+		crypto.SHA1,        // import crypto/sha1
+		crypto.SHA224,      // import crypto/sha256
+		crypto.SHA256,      // import crypto/sha256
+		crypto.SHA384,      // import crypto/sha512
+		crypto.SHA512,      // import crypto/sha512
+		crypto.RIPEMD160,   // import golang.org/x/crypto/ripemd160
+		crypto.SHA3_224,    // import golang.org/x/crypto/sha3
+		crypto.SHA3_256,    // import golang.org/x/crypto/sha3
+		crypto.SHA3_384,    // import golang.org/x/crypto/sha3
+		crypto.SHA3_512,    // import golang.org/x/crypto/sha3
+		crypto.SHA512_224,  // import crypto/sha512
+		crypto.SHA512_256,  // import crypto/sha512
+		crypto.BLAKE2s_256, // import golang.org/x/crypto/blake2s
+		crypto.BLAKE2b_256, // import golang.org/x/crypto/blake2b
+		crypto.BLAKE2b_384, // import golang.org/x/crypto/blake2b
+		crypto.BLAKE2b_512, // import golang.org/x/crypto/blake2b
+	}
+
+	for words := range testWords(t) {
+		for _, hash := range hashes {
+			h := hash.New()
+			data := h.Sum(nil)
+			if len(data) != h.Size() {
+				t.Fatalf("expected size=%d, got=%d", h.Size(), len(data))
+			}
+			test(words, data, t)
 		}
 	}
 }
