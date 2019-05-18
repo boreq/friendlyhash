@@ -58,7 +58,7 @@ If you prefer to use emoji the following library has a list of those:
 
 ## Code example
 
-	dictionary := []string{"word1", "word2", "word3", "word4", "word5", "word6" }
+	dictionary := []string{"word1", "word2", "word3", "word4", "word5", "word6"}
     hashSize := 2
 
 	// Create
