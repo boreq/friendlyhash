@@ -27,6 +27,7 @@ func New(dictionary []string, hashLength int) (*FriendlyHash, error) {
 	return rv, nil
 }
 
+// FriendlyHash creates a human-friendly representation of byte slices.
 type FriendlyHash struct {
 	dictionary []string
 	hashLength int
@@ -99,7 +100,7 @@ func (h *FriendlyHash) NumberOfWords() int {
 	return howManyWords(bitsPerWord, h.hashLength)
 }
 
-// HumberOfBytes returns the hash length returned by the dehumanize function.
+// NumberOfBytes returns the hash length returned by the dehumanize function.
 func (h *FriendlyHash) NumberOfBytes() int {
 	return h.hashLength
 }
